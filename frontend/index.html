@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard de Vendas</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar__brand">
+        <h1>Dashboard de Vendas</h1>
+        <p>Monitoramento em tempo real das plataformas de pagamentos</p>
+      </div>
+      <button id="refreshButton" class="btn btn--ghost" type="button">
+        Atualizar agora
+      </button>
+    </header>
+
+    <main class="layout">
+      <section class="panel panel--filters" aria-label="Filtros principais">
+        <header class="panel__header panel__header--filters">
+          <h2>Filtros</h2>
+          <div class="filters filters--compact">
+            <label class="input-group input-group--inline">
+              <span>Plataforma</span>
+              <select id="filterPlatform">
+                <option value="">Todas</option>
+                <option value="AppMax">AppMax</option>
+                <option value="PerfectPay">PerfectPay</option>
+                <option value="Hotmart">Hotmart</option>
+                <option value="MercadoPago">MercadoPago</option>
+              </select>
+            </label>
+            <label class="input-group input-group--inline">
+              <span>Data</span>
+              <select id="filterDate">
+                <option value="all">Todo o período</option>
+                <option value="today">Hoje</option>
+                <option value="yesterday">Ontem</option>
+                <option value="last7d">Últimos 7 dias</option>
+                <option value="currentMonth">Mês atual</option>
+                <option value="lastMonth">Mês anterior</option>
+              </select>
+            </label>
+          </div>
+        </header>
+      </section>
+
+      <section class="metrics" aria-label="Indicadores principais">
+        <article class="metric-card metric-card--primary">
+          <div class="metric-card__header">
+            <div
+              class="metric-card__icon metric-card__icon--currency"
+              aria-hidden="true"
+            >
+              <span>R$</span>
+            </div>
+            <div class="metric-card__titles">
+              <span class="metric-card__title">Total Vendido</span>
+              <span class="metric-card__subtitle"
+                >Somatório no período selecionado</span
+              >
+            </div>
+          </div>
+          <div class="metric-card__body">
+            <strong id="totalValue" class="metric-card__value text-money"
+              >R$ 0,00</strong
+            >
+            <div class="metric-card__footer">
+              <span
+                class="metric-card__dot"
+                data-kpi-dot="totalValue"
+                aria-hidden="true"
+              ></span>
+              <span id="totalValueDelta" class="metric-card__delta">—</span>
+              <span
+                id="totalValueDeltaPct"
+                class="metric-card__delta metric-card__delta--muted"
+              ></span>
+            </div>
+          </div>
+        </article>
+
+        <article class="metric-card">
+          <div class="metric-card__header">
+            <div class="metric-card__icon" aria-hidden="true">
+              <span>#</span>
+            </div>
+            <div class="metric-card__titles">
+              <span class="metric-card__title">Pedidos</span>
+              <span class="metric-card__subtitle">Quantidade consolidada</span>
+            </div>
+          </div>
+          <div class="metric-card__body">
+            <strong id="totalOrders" class="metric-card__value">0</strong>
+            <div class="metric-card__footer">
+              <span
+                class="metric-card__dot"
+                data-kpi-dot="totalOrders"
+                aria-hidden="true"
+              ></span>
+              <span id="totalOrdersDelta" class="metric-card__delta">—</span>
+              <span
+                id="totalOrdersDeltaPct"
+                class="metric-card__delta metric-card__delta--muted"
+              ></span>
+            </div>
+          </div>
+        </article>
+
+        <article class="metric-card">
+          <div class="metric-card__header">
+            <div class="metric-card__icon" aria-hidden="true">
+              <span>Ø</span>
+            </div>
+            <div class="metric-card__titles">
+              <span class="metric-card__title">Ticket Médio</span>
+              <span class="metric-card__subtitle">Valor médio por pedido</span>
+            </div>
+          </div>
+          <div class="metric-card__body">
+            <strong id="averageTicket" class="metric-card__value text-money"
+              >R$ 0,00</strong
+            >
+            <div class="metric-card__footer">
+              <span
+                class="metric-card__dot"
+                data-kpi-dot="averageTicket"
+                aria-hidden="true"
+              ></span>
+              <span id="averageTicketDelta" class="metric-card__delta">—</span>
+              <span
+                id="averageTicketDeltaPct"
+                class="metric-card__delta metric-card__delta--muted"
+              ></span>
+            </div>
+          </div>
+        </article>
+
+        <article class="metric-card">
+          <div class="metric-card__header">
+            <div class="metric-card__icon" aria-hidden="true">
+              <span>Kit</span>
+            </div>
+            <div class="metric-card__titles">
+              <span class="metric-card__title">Pedidos — Kit</span>
+              <span class="metric-card__subtitle"
+                >Quantidade e valor total</span
+              >
+            </div>
+          </div>
+          <div class="metric-card__body">
+            <div class="metric-card__value-group">
+              <strong id="kitOrdersCount" class="metric-card__value">0</strong>
+              <span id="kitOrdersValue" class="metric-card__hint text-money"
+                >R$ 0,00</span
+              >
+            </div>
+            <div class="metric-card__footer">
+              <span
+                class="metric-card__dot"
+                data-kpi-dot="kitCount"
+                aria-hidden="true"
+              ></span>
+              <span id="kitOrdersDelta" class="metric-card__delta">—</span>
+              <span
+                id="kitOrdersDeltaPct"
+                class="metric-card__delta metric-card__delta--muted"
+              ></span>
+            </div>
+          </div>
+        </article>
+
+        <article class="metric-card">
+          <div class="metric-card__header">
+            <div class="metric-card__icon" aria-hidden="true">
+              <span>AM</span>
+            </div>
+            <div class="metric-card__titles">
+              <span class="metric-card__title">Pedidos — Amostra grátis</span>
+              <span class="metric-card__subtitle"
+                >Quantidade e valor total</span
+              >
+            </div>
+          </div>
+          <div class="metric-card__body">
+            <div class="metric-card__value-group">
+              <strong id="sampleOrdersCount" class="metric-card__value"
+                >0</strong
+              >
+              <span id="sampleOrdersValue" class="metric-card__hint text-money"
+                >R$ 0,00</span
+              >
+            </div>
+            <div class="metric-card__footer">
+              <span
+                class="metric-card__dot"
+                data-kpi-dot="sampleCount"
+                aria-hidden="true"
+              ></span>
+              <span id="sampleOrdersDelta" class="metric-card__delta">—</span>
+              <span
+                id="sampleOrdersDeltaPct"
+                class="metric-card__delta metric-card__delta--muted"
+              ></span>
+            </div>
+          </div>
+        </article>
+
+        <article class="metric-card">
+          <div class="metric-card__header">
+            <div class="metric-card__icon" aria-hidden="true">
+              <span>CC</span>
+            </div>
+            <div class="metric-card__titles">
+              <span class="metric-card__title">Pedidos — Callcenter</span>
+              <span class="metric-card__subtitle"
+                >Quantidade e valor total</span
+              >
+            </div>
+          </div>
+          <div class="metric-card__body">
+            <div class="metric-card__value-group">
+              <strong id="callcenterOrdersCount" class="metric-card__value"
+                >0</strong
+              >
+              <span
+                id="callcenterOrdersValue"
+                class="metric-card__hint text-money"
+                >R$ 0,00</span
+              >
+            </div>
+            <div class="metric-card__footer">
+              <span
+                class="metric-card__dot"
+                data-kpi-dot="callcenterCount"
+                aria-hidden="true"
+              ></span>
+              <span id="callcenterOrdersDelta" class="metric-card__delta"
+                >—</span
+              >
+              <span
+                id="callcenterOrdersDeltaPct"
+                class="metric-card__delta metric-card__delta--muted"
+              ></span>
+            </div>
+          </div>
+        </article>
+
+        <article class="metric-card metric-card--status">
+          <div class="metric-card__header">
+            <div
+              class="metric-card__icon metric-card__icon--pulse"
+              aria-hidden="true"
+            >
+              <span>●</span>
+            </div>
+            <div class="metric-card__titles">
+              <span class="metric-card__title">Vendas Recentes</span>
+              <span class="metric-card__subtitle"
+                >Sincronização manual sob demanda</span
+              >
+            </div>
+          </div>
+          <div class="metric-card__body">
+            <strong id="realtimeStatus" class="metric-card__status"
+              >Aguardando...</strong
+            >
+            <span class="metric-card__hint"
+              >Use o botão "Atualizar agora" sempre que desejar</span
+            >
+          </div>
+        </article>
+      </section>
+
+      <section class="panel" aria-label="Tendência das métricas">
+        <header class="panel__header panel__header--chart">
+          <div>
+            <h2>Visão Temporal</h2>
+            <p>KPIs consolidadas nas sincronizações recentes</p>
+          </div>
+          <div class="kpi-toggles" aria-label="Seleção de KPIs">
+            <span class="kpi-toggles__label">Exibir KPIs</span>
+            <div class="kpi-toggles__group">
+              <label class="toggle">
+                <input type="checkbox" data-kpi-toggle="totalValue" checked />
+                <span>Total Vendido</span>
+              </label>
+              <label class="toggle">
+                <input
+                  type="checkbox"
+                  data-kpi-toggle="averageTicket"
+                  checked
+                />
+                <span>Ticket Médio</span>
+              </label>
+              <label class="toggle">
+                <input type="checkbox" data-kpi-toggle="totalOrders" checked />
+                <span>Pedidos</span>
+              </label>
+              <label class="toggle">
+                <input type="checkbox" data-kpi-toggle="kitCount" checked />
+                <span>Kits</span>
+              </label>
+              <label class="toggle">
+                <input type="checkbox" data-kpi-toggle="sampleCount" checked />
+                <span>Amostras</span>
+              </label>
+              <label class="toggle">
+                <input
+                  type="checkbox"
+                  data-kpi-toggle="callcenterCount"
+                  checked
+                />
+                <span>Callcenter</span>
+              </label>
+            </div>
+          </div>
+        </header>
+        <div class="chart-container">
+          <canvas
+            id="metricsChart"
+            aria-label="Gráfico de linhas das métricas"
+            role="img"
+          ></canvas>
+        </div>
+      </section>
+
+      <section class="panel" aria-label="Tabela de pedidos">
+        <header class="panel__header">
+          <div>
+            <h2>Pedidos</h2>
+            <p>Últimos pedidos recebidos via plataformas integradas</p>
+          </div>
+          <div class="panel__actions">
+            <span class="badge" id="ordersCountBadge">0 pedidos</span>
+          </div>
+        </header>
+        <div class="table-responsive">
+          <table class="orders-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Valor</th>
+                <th>Status</th>
+                <th>Plataforma</th>
+                <th>Data</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+              <tr>
+                <td colspan="6" class="table-empty">Sem dados disponíveis</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>Feito para monitorar suas vendas em tempo real.</span>
+      <span id="lastUpdated">Atualização automática a cada 5 segundos.</span>
+    </footer>
+
+    <template id="orderRowTemplate">
+      <tr>
+        <td data-field="order_id"></td>
+        <td data-field="customer_name"></td>
+        <td data-field="value"></td>
+        <td data-field="status"></td>
+        <td data-field="platform"></td>
+        <td data-field="created_at"></td>
+      </tr>
+    </template>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+    <script src="script.js" defer></script>
+  </body>
+</html>
